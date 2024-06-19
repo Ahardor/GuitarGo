@@ -11,8 +11,6 @@ var upgrader = websocket.Upgrader{}
 var receiver *websocket.Conn
 var sender *websocket.Conn
 
-var send_msg []byte = make([]byte, 0)
-
 func main() {
 	http.HandleFunc("/ws", wsHandler)
 	http.HandleFunc("/", rootHandler)
@@ -56,19 +54,13 @@ func echo(conn *websocket.Conn) {
 		
 
 		// fmt.Println("Received message type:", t)
-		// fmt.Println("Received message:", string(msg))
+		// fmt.Println("Received message:", msg)
 		if t == websocket.BinaryMessage {
 			// fmt.Println("Binary message received")
 			if receiver != nil {
-				send_msg = append(send_msg, msg...)
-				if len(send_msg) == 500 {
-					
-					err_send := receiver.WriteMessage(websocket.BinaryMessage, send_msg)
-					if err_send != nil {
-						fmt.Println(err_send)
-					}
-
-					send_msg = make([]byte, 0)
+				err_send := receiver.WriteMessage(websocket.BinaryMessage, msg)
+				if err_send != nil {
+					fmt.Println(err_send)
 				}
 			}
 		}
